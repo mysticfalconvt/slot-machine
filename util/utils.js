@@ -19,3 +19,17 @@ export function isWinningRoll(currentSet) {
     return true
 }
 
+export function getWinningReward(roll) {
+    if (!isWinningRoll(roll)) {
+        return 0
+    }
+    if (roll[0] === 'cherry') {
+        return 10
+    } else if (roll[0] === 'lemon') {
+        return 20
+    } else if (roll[0] === 'orange') {
+        return 30
+    } else if (roll[0] === 'watermelon') {
+        return 40
+    }
+}

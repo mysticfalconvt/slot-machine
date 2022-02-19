@@ -2,7 +2,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { getCheatPercentage } from '../util/utils';
+import { getCheatPercentage, isWinningRoll, getWinningReward } from '../util/utils';
 
 const options = [
   'cherry', 'orange', 'lemon', 'watermelon'
@@ -19,8 +19,8 @@ const getRandoms = () => {
 // get the next set of 3 including a cheat reroll if necessary
 const getNextSet = (currentSet, cheatPercentage) => {
   const nextSet = getRandoms();
-  const isWinningRoll = isWinningRoll(nextSet);
-  if (isWinningRoll) {
+  const didWin = isWinningRoll(nextSet);
+  if (didWin) {
     const doWeRollAgain = Math.random() < cheatPercentage;
     if (doWeRollAgain) {
       const cheatRoll = getRandoms();
@@ -30,12 +30,16 @@ const getNextSet = (currentSet, cheatPercentage) => {
   return nextSet;
 }
 
-const Slider = ({ selected }) => {
+const Slider = ({ selected, isSpinning }) => {
   return (
     <div className="flex-1 w-[120px] h-full divide-y-4 divide-purple-900">
       <div className="w-[120px] h-[30px]"></div>
       <div className="w-[120px] h-[120px]">
-        <Image height="120" width="120" src={`/${selected}.svg`} />
+        {isSpinning ? (
+          <Image height="120" width="120" src={`/logo.svg`} />
+        ) : (
+          <Image height="120" width="120" src={`/${selected}.svg`} />
+        )}
       </div>
       <div className="w-[120px] h-[30px]"></div>
     </div>
@@ -54,9 +58,57 @@ export default function Home() {
   }, [currentCredits])
   // state to store the currently displayed set of 3  
   const [currentSet, setCurrentSet] = useState(firstSet)
-
+  // state for the next value to be displayed
   const [nextSet, setNextSet] = useState(getRandoms())
+  // game state 
+  const [gameState, setGameState] = useState('idle')
+  // state for each spinner spinning or stopped
+  const [spinnerIsSpinning, setSpinnerIsSpinning] = useState([false, false, false])
 
+  // manage the game state 
+  useEffect(async () => {
+    //if out of money game over
+    if (currentCredits === 0) {
+      setGameState('gameover')
+    }
+    // idle state
+    if (gameState === 'idle') {
+      return;
+    }
+    // what to do when we roll
+    if (gameState === 'rolling') {
+
+      setCurrentCredits(currentCredits - 1)
+      // wait .5 second before spinning
+      await new Promise(resolve => setTimeout(resolve, 500))
+      console.log('rolling')
+      // set the spinner to spinning
+      setSpinnerIsSpinning([true, true, true])
+      setCurrentSet(nextSet)
+      // wait 1 second before stopping the first spinner
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      console.log('stopping first spinner')
+      // set the 1st spinner to stopped
+      setSpinnerIsSpinning([false, true, true])
+      // wait 1 second before stopping the second spinner
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      console.log('stopping second spinner')
+      // set the 2nd spinner to stopped
+      setSpinnerIsSpinning([false, false, true])
+      // wait 1 second before stopping the third spinner
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      console.log('stopping third spinner')
+      // set the 3rd spinner to stopped
+      setSpinnerIsSpinning([false, false, false])
+      setNextSet(getNextSet(currentSet, cheatPercentage))
+      const didWin = isWinningRoll(nextSet)
+      if (didWin) setGameState('win')
+      else setGameState('lose')
+
+    }
+
+
+  }, [gameState])
 
 
 
@@ -80,7 +132,7 @@ export default function Home() {
                   <div className="border-4 border-purple-900 rounded-sm bg-white overflow-hidden">
                     <div className="flex items-center h-[180px] divide-x-4 divide-purple-900">
                       {currentSet.map((elem, i) => (
-                        <Slider selected={elem} key={i} />
+                        <Slider selected={elem} isSpinning={spinnerIsSpinning[i]} key={i} />
                       ))}
                     </div>
                   </div>
@@ -105,9 +157,13 @@ export default function Home() {
               </a>
             </div>
             <div className="absolute z-20 bottom-0 w-full flex justify-center mb-[-30px]">
-              <a className="border-4 border-purple-900 text-white bg-red-500 px-6 py-2 font-extrabold hover:bg-red-400 hover:border-purple-800 transition-colors">
+              <button type='button' disabled={gameState != "idle"}
+                onClick={() => {
+                  setGameState('rolling')
+                }}
+                className="border-4 border-purple-900 text-white bg-red-500 px-6 py-2 font-extrabold hover:bg-red-400 hover:border-purple-800 transition-colors">
                 try your luck
-              </a>
+              </button>
             </div>
           </div>
         </div>
