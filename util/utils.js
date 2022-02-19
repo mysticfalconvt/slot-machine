@@ -33,3 +33,16 @@ export function getWinningReward(roll) {
         return 40
     }
 }
+
+export function cashOutButtonEffects() {
+    // 50% chance that it moves
+    const doesMove = Math.random() < .5;
+
+    //40% chance that it is unclickable
+    const isClickable = Math.random() > .6;
+
+    //random direction to move up, down, left, right
+    const directionToMove = !doesMove ? "none" : Math.random() < .5 ? 'up' : Math.random() < .5 ? 'down' : Math.random() < .5 ? 'left' : 'right';
+    console.log(isClickable)
+    return { doesMove, isClickable, directionToMove }
+}
