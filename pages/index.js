@@ -1,6 +1,8 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import { useState } from 'react';
+import { useEffect } from 'react';
+import { getCheatPercentage } from '../util/utils';
 
 const options = [
   'cherry', 'orange', 'lemon', 'watermelon'
@@ -13,6 +15,19 @@ const getRandoms = () => {
     options[getRandom()],
     options[getRandom()]
   ]
+}
+// get the next set of 3 including a cheat reroll if necessary
+const getNextSet = (currentSet, cheatPercentage) => {
+  const nextSet = getRandoms();
+  const isWinningRoll = isWinningRoll(nextSet);
+  if (isWinningRoll) {
+    const doWeRollAgain = Math.random() < cheatPercentage;
+    if (doWeRollAgain) {
+      const cheatRoll = getRandoms();
+      return cheatRoll;
+    }
+  }
+  return nextSet;
 }
 
 const Slider = ({ selected }) => {
@@ -29,8 +44,24 @@ const Slider = ({ selected }) => {
 
 export default function Home() {
   const firstSet = getRandoms()
-  console.log(firstSet)
+  // user starts with 10 credits
   const [currentCredits, setCurrentCredits] = useState(10)
+  // cheating computer reroll chance
+  const [cheatPercentage, setCheatPercentage] = useState(0)
+  // get chance for computer reroll
+  useEffect(() => {
+    setCheatPercentage(getCheatPercentage(currentCredits))
+  }, [currentCredits])
+  // state to store the currently displayed set of 3  
+  const [currentSet, setCurrentSet] = useState(firstSet)
+
+  const [nextSet, setNextSet] = useState(getRandoms())
+
+
+
+
+
+
   return (
     <div className="font-sans bg-gray-200 absolute inset-0 overflow-hidden flex items-center justify-center">
       <Head>
@@ -48,7 +79,7 @@ export default function Home() {
                 <div className="bg-teal-400 p-2">
                   <div className="border-4 border-purple-900 rounded-sm bg-white overflow-hidden">
                     <div className="flex items-center h-[180px] divide-x-4 divide-purple-900">
-                      {firstSet.map((elem, i) => (
+                      {currentSet.map((elem, i) => (
                         <Slider selected={elem} key={i} />
                       ))}
                     </div>
