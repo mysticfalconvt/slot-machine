@@ -7,7 +7,7 @@ import { getCheatPercentage, isWinningRoll, getWinningReward, getCashOutButtonEf
 const options = [
   'cherry', 'orange', 'lemon', 'watermelon'
 ]
-const waitTime = 10;
+const waitTime = 1000;
 
 const getRandom = () => Math.floor(Math.random() * 4);
 const getRandoms = () => {
