@@ -1,5 +1,8 @@
 # The House Always Wins - NextJS
 
+## My notes
+Most functionality is there.  The cash button moving has a little bug.  I don't have much tailwind experience so I spent a little too much time reading the tailwind docs.  I'm sure there are some things I could do better. I would love feedback.  I'm open to any suggestions.
+
 ## Objective
 
 Jackpot! You've landed a summer gig in Las Vegas! Unfortunately, its the year 2021, and the casinos are closed due to COVID-19. Your boss wants to move some of the business online and asks you to build a front-end app — a simple slot machine game, with a little twist. Build it to ensure that the house always wins!

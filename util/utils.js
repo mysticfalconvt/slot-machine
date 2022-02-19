@@ -34,15 +34,15 @@ export function getWinningReward(roll) {
     }
 }
 
-export function cashOutButtonEffects() {
+export function getCashOutButtonEffects() {
     // 50% chance that it moves
     const doesMove = Math.random() < .5;
 
     //40% chance that it is unclickable
     const isClickable = Math.random() > .6;
 
+
     //random direction to move up, down, left, right
-    const directionToMove = !doesMove ? "none" : Math.random() < .5 ? 'up' : Math.random() < .5 ? 'down' : Math.random() < .5 ? 'left' : 'right';
-    console.log(isClickable)
+    const directionToMove = !doesMove ? "" : Math.random() < .25 ? 'translate-y-[-300px]' : Math.random() < .33 ? 'translate-y-[300px]' : Math.random() < .5 ? 'translate-x-[-300px]' : 'translate-x-[300px]';
     return { doesMove, isClickable, directionToMove }
 }

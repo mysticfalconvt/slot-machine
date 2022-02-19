@@ -2,7 +2,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { getCheatPercentage, isWinningRoll, getWinningReward, cashOutButtonEffects } from '../util/utils';
+import { getCheatPercentage, isWinningRoll, getWinningReward, getCashOutButtonEffects } from '../util/utils';
 
 const options = [
   'cherry', 'orange', 'lemon', 'watermelon'
@@ -74,7 +74,7 @@ export default function Home() {
   const [cashoutButtonEffects, setCashoutButtonEffects] = useState({
     doesMove: false,
     isClickable: true,
-    directionToMove: 'none'
+    directionToMove: ''
   })
 
   // manage the game state 
@@ -119,12 +119,14 @@ export default function Home() {
 
 
 
+
   return (
     <div className="font-sans bg-gray-200 absolute inset-0 overflow-hidden flex items-center justify-center">
       <Head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;800&display=swap" rel="stylesheet" />
+
       </Head>
       <div className="border-4 border-purple-900 rounded-sm shadow-lg bg-white w-full max-w-2xl">
         <div className="border-4 border-blue-700 relative">
@@ -152,18 +154,20 @@ export default function Home() {
               </div>
             </div>
             <div className="flex justify-between mt-8"
-              onMouseEnter={() => {
-                console.log("hover")
-                setCashoutButtonEffects(cashOutButtonEffects())
-              }}>
+            >
               <button type='button'
+
                 onClick={() => {
                   setGameState("cashout")
                 }}
 
                 disabled={cashoutButtonEffects.isClickable}
-                className="border-4 border-purple-900 text-purple-900 font-extrabold h-8 flex items-center">
-                <span className="px-3 border-r-4 border-purple-900 block">cash out</span>
+                className={` border-4 border-purple-900 text-purple-900 font-extrabold h-8 flex items-center transform ${cashoutButtonEffects.directionToMove}`}>
+                <span
+                  onMouseEnter={() => {
+                    setCashoutButtonEffects(getCashOutButtonEffects())
+                  }}
+                  className="px-3 border-r-4 border-purple-900 block">cash out</span>
                 <span className="px-2">{cashoutCredits}</span>
               </button>
               <a className="border-4 border-purple-900 text-purple-900 font-extrabold h-8 flex items-center">
