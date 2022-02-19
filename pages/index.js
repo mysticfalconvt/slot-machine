@@ -7,6 +7,7 @@ import { getCheatPercentage, isWinningRoll, getWinningReward } from '../util/uti
 const options = [
   'cherry', 'orange', 'lemon', 'watermelon'
 ]
+const waitTime = 1000;
 
 const getRandom = () => Math.floor(Math.random() * 4);
 const getRandoms = () => {
@@ -36,7 +37,8 @@ const Slider = ({ selected, isSpinning }) => {
       <div className="w-[120px] h-[30px]"></div>
       <div className="w-[120px] h-[120px]">
         {isSpinning ? (
-          <Image height="120" width="120" src={`/logo.svg`} />
+          // logo to represent spinning
+          <Image height="120" width="120" src={`/logo.svg`} className="animate-bounce" />
         ) : (
           <Image height="120" width="120" src={`/${selected}.svg`} />
         )}
@@ -61,9 +63,12 @@ export default function Home() {
   // state for the next value to be displayed
   const [nextSet, setNextSet] = useState(getRandoms())
   // game state 
-  const [gameState, setGameState] = useState('idle')
+  const [gameState, setGameState] = useState('gameover')
   // state for each spinner spinning or stopped
   const [spinnerIsSpinning, setSpinnerIsSpinning] = useState([false, false, false])
+  // state for cashout credits
+  const [cashoutCredits, setCashoutCredits] = useState(0)
+
 
   // manage the game state 
   useEffect(async () => {
@@ -77,26 +82,25 @@ export default function Home() {
     }
     // what to do when we roll
     if (gameState === 'rolling') {
-
       setCurrentCredits(currentCredits - 1)
       // wait .5 second before spinning
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise(resolve => setTimeout(resolve, waitTime / 2))
       console.log('rolling')
       // set the spinner to spinning
       setSpinnerIsSpinning([true, true, true])
       setCurrentSet(nextSet)
       // wait 1 second before stopping the first spinner
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise(resolve => setTimeout(resolve, waitTime))
       console.log('stopping first spinner')
       // set the 1st spinner to stopped
       setSpinnerIsSpinning([false, true, true])
       // wait 1 second before stopping the second spinner
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise(resolve => setTimeout(resolve, waitTime))
       console.log('stopping second spinner')
       // set the 2nd spinner to stopped
       setSpinnerIsSpinning([false, false, true])
       // wait 1 second before stopping the third spinner
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise(resolve => setTimeout(resolve, waitTime))
       console.log('stopping third spinner')
       // set the 3rd spinner to stopped
       setSpinnerIsSpinning([false, false, false])
@@ -104,9 +108,7 @@ export default function Home() {
       const didWin = isWinningRoll(nextSet)
       if (didWin) setGameState('win')
       else setGameState('lose')
-
     }
-
 
   }, [gameState])
 
@@ -147,24 +149,59 @@ export default function Home() {
               </div>
             </div>
             <div className="flex justify-between mt-8">
-              <a className="border-4 border-purple-900 text-purple-900 font-extrabold h-8 flex items-center">
+              <button type='button'
+                onClick={() => {
+                  if (currentCredits > 10) {
+                    setCashoutCredits(currentCredits - 10)
+                    setCurrentCredits(10)
+                  };
+                }}
+                className="border-4 border-purple-900 text-purple-900 font-extrabold h-8 flex items-center">
                 <span className="px-3 border-r-4 border-purple-900 block">cash out</span>
-                <span className="px-2">12</span>
-              </a>
+                <span className="px-2">{cashoutCredits}</span>
+              </button>
               <a className="border-4 border-purple-900 text-purple-900 font-extrabold h-8 flex items-center">
                 <span className="px-3 border-r-4 border-purple-900 block">credits</span>
                 <span className="px-2">{currentCredits}</span>
               </a>
             </div>
             <div className="absolute z-20 bottom-0 w-full flex justify-center mb-[-30px]">
-              <button type='button' disabled={gameState != "idle"}
+              {gameState === "idle" && <button type='button'
                 onClick={() => {
                   setGameState('rolling')
                 }}
                 className="border-4 border-purple-900 text-white bg-red-500 px-6 py-2 font-extrabold hover:bg-red-400 hover:border-purple-800 transition-colors">
                 try your luck
-              </button>
+              </button>}
             </div>
+            {/* modal to show lost */}
+            {gameState != "idle" && gameState != "rolling" && (
+              <>
+                <div className="absolute bg-white/50  z-50 w-full h-full top-0 left-0 ">
+                  <div className='flex  flex-col items-center  justify-center h-full'>
+                    <h2 className="text-center text-purple-900 font-extrabold text-4xl">
+                      {gameState === "win" && "big win"}
+                      {gameState === "lose" && "big lose"}
+                      {gameState === "gameover" && "game over"}
+                    </h2>
+                    <p className='text-center text-purple-900 font-extrabold text-1xl  mb-5'>
+                      {gameState === "win" && "not sure how that happened?"}
+                      {gameState === "lose" && "better luck next time!"}
+                      {gameState === "gameover" && "better luck next time"}
+                    </p>
+                    {gameState !== "gameover" && <button type='button'
+                      onClick={() => {
+                        setCurrentCredits(currentCredits + getWinningReward(currentSet))
+                        setGameState('idle')
+                      }}
+                      className="border-4 border-purple-900 text-white bg-red-500 px-6 py-2 font-extrabold hover:bg-red-400 hover:border-purple-800 transition-colors">
+                      try again
+                    </button>}
+                    {gameState === "gameover" && <Image src="/logo.svg" width="103" height="37" />}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
