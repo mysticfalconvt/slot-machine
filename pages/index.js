@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import Image from 'next/image'
+import { useState } from 'react';
 
 const options = [
   'cherry', 'orange', 'lemon', 'watermelon'
@@ -28,6 +29,8 @@ const Slider = ({ selected }) => {
 
 export default function Home() {
   const firstSet = getRandoms()
+  console.log(firstSet)
+  const [currentCredits, setCurrentCredits] = useState(10)
   return (
     <div className="font-sans bg-gray-200 absolute inset-0 overflow-hidden flex items-center justify-center">
       <Head>
@@ -67,7 +70,7 @@ export default function Home() {
               </a>
               <a className="border-4 border-purple-900 text-purple-900 font-extrabold h-8 flex items-center">
                 <span className="px-3 border-r-4 border-purple-900 block">credits</span>
-                <span className="px-2">4</span>
+                <span className="px-2">{currentCredits}</span>
               </a>
             </div>
             <div className="absolute z-20 bottom-0 w-full flex justify-center mb-[-30px]">
