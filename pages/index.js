@@ -7,7 +7,7 @@ import { getCheatPercentage, isWinningRoll, getWinningReward, getCashOutButtonEf
 const options = [
   'cherry', 'orange', 'lemon', 'watermelon'
 ]
-const waitTime = 1000;
+const waitTime = 10;
 
 const getRandom = () => Math.floor(Math.random() * 4);
 const getRandoms = () => {
@@ -201,7 +201,7 @@ export default function Home() {
                       {gameState === "gameover" && "better luck next time"}
                       {gameState === "cashout" && "sure you don’t want to try again?"}
                     </p>
-                    {gameState !== "gameover" || gameState !== "cashOut" && <button type='button'
+                    {gameState !== "gameover" && gameState !== "cashout" && <button type='button'
                       onClick={() => {
                         setCurrentCredits(currentCredits + getWinningReward(currentSet))
                         setGameState('idle')
